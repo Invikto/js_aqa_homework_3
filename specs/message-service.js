@@ -1,55 +1,114 @@
 const {
-    startClientPC,
-    startSatelite,
-    stopClientPC,
-    stopEarthServer,
-    stopSatelite,
-    stopMarsServer,
-    startEarthServer,
-    startMarsServer,
-    sendMessage,
-    assertResponse
+  startClientPC,
+  startSatelite,
+  stopClientPC,
+  stopEarthServer,
+  stopSatelite,
+  stopMarsServer,
+  startEarthServer,
+  startMarsServer,
+  sendMessage,
+  assertResponse
 } = require('./stubs/messageservice.stubs');
 
-// REMOVE THE BELOW CODE BEFORE START THE EXERCISE
+describe('Success message sending', function () {
 
-function startAllNodes() {
+  before('Start the client PC', function () {
     startClientPC();
-    const earthToken = startEarthServer();
-    const marsToken = startMarsServer();
-    startSatelite();
-    return {
-        earth: earthToken,
-        mars: marsToken,
-    }
-}
+  });
 
-function stopAllNodes(){
-    stopMarsServer();
-    stopEarthServer();
-    stopSatelite();
+  context('The message is sent to Earth', function () {
+
+    it('The response is "Success" when the correct request and all services are available', function () {
+      const token = startEarthServer();
+      const response = sendMessage('Hello', 'Earth', token);
+      assertResponse(response, 'Success');
+      stopEarthServer();
+    });
+
+  });
+
+  context('The message is sent to Mars', function () {
+
+    before('Start the satelite', function () {
+      startSatelite();
+    });
+
+    it('The response is "Success" when the correct request and all services are available', function () {
+      const token = startMarsServer();
+      const response = sendMessage('Hello', 'Mars', token);
+      assertResponse(response, 'Success');
+      stopMarsServer();
+    });
+
+    after('Stop the satelite', function () {
+      stopSatelite();
+    });
+
+  });
+
+  after('Stop the client PC', function () {
     stopClientPC();
-}
+  });
 
-describe('Message Sending', function () {
-    it('should send message to Mars without error', function () {
-        let tokens = startAllNodes();
-        const response = sendMessage('Hello', 'Mars', tokens.mars);
-        assertResponse(response, 'Success');
-        stopAllNodes()
+});
+
+describe('Failed message sending', function () {
+
+  before('Start the client PC', function () {
+    startClientPC();
+  });
+
+  context('The message is sent to Earth', function () {
+
+    it('The response is "Security Error" when the invalid token', function () {
+      startEarthServer();
+      const response = sendMessage('Hello', 'Earth', 'X0000');
+      assertResponse(response, 'Security Error');
+      stopEarthServer();
     });
 
-    it('should send message to Earth without error', function () {
-        let tokens = startAllNodes();
-        const response = sendMessage('Hello', 'Earth', tokens.earth);
-        assertResponse(response, 'Success');
-        stopAllNodes()
+  });
+
+  context('The message is sent to Mars', function () {
+
+    before('Start the satelite', function () {
+      startSatelite();
     });
 
-    it('should send message to Earth with "Security Error"', function () {
-        startAllNodes();
-        const response = sendMessage('Hello', 'Earth', 'X0000');
-        assertResponse(response, 'Security Error');
-        stopAllNodes()
+    it('The response is "Security Error" when the invalid token', function () {
+      startMarsServer();
+      const response = sendMessage('Hello', 'Mars', 'X0000');
+      assertResponse(response, 'Security Error');
+      stopMarsServer();
     });
-})
+
+    it('The response is "Service is unavailable" when the unavailable satellite', function () {
+      const token = startMarsServer();
+      stopSatelite();
+      const response = sendMessage('Hello', 'Mars', token);
+      assertResponse(response, 'Service is unavailable');
+      stopMarsServer();
+      startSatelite();
+    });
+
+    it('The response is "Service is unavailable" when the unavailable satellite and the invalid token', function () {
+      startMarsServer();
+      stopSatelite();
+      const response = sendMessage('Hello', 'Mars', 'X0000');
+      assertResponse(response, 'Service is unavailable');
+      stopMarsServer();
+      startSatelite();
+    });
+
+    after('Stop the satelite', function () {
+      stopSatelite();
+    });
+
+  });
+
+  after('Stop the client PC', function () {
+    stopClientPC();
+  });
+
+});
