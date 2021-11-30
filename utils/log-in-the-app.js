@@ -1,4 +1,4 @@
-module.exports = async function () {
+module.exports = async function logInTheApp() {
   const BASE_URI = 'https://viktor-silakov.github.io/course-sut/index.html?quick';
   const LOGIN = 'walker@jw.com';
   const PASSWORD = 'password';
