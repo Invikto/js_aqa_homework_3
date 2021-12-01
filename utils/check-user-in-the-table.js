@@ -1,5 +1,3 @@
-const assert = require('chai').assert;
-
 const userPropsSelectors = {
   email: './/*[@tabulator-field="email"]',
   role: './/*[@tabulator-field="role"]',
@@ -17,24 +15,24 @@ const userPropsSelectors = {
 module.exports = async function checkUserInTheTable(user) {
   const emailSelector = `//*[contains(text(), "${user.email}")]`;
   const row = await $('#users-table').$(emailSelector).$('.//ancestor::*[@role="row"]');
-  const role = await row.$(userPropsSelectors.role).getText();
-  assert.equal(role, user.role);
-  const address_1 = await row.$(userPropsSelectors.address_1).getText();
-  assert.equal(address_1, user.address_1);
-  const address_2 = await row.$(userPropsSelectors.address_2).getText();
-  assert.equal(address_2, user.address_2);
-  const city = await row.$(userPropsSelectors.city).getText();
-  assert.equal(city, user.city);
-  const state = await row.$(userPropsSelectors.state).getText();
-  assert.equal(state, user.stateForRead);
-  const zip = await row.$(userPropsSelectors.zip).getText();
-  assert.equal(zip, user.zip);
-  const description = await row.$(userPropsSelectors.description).getText();
-  assert.equal(description, user.description);
-  const demoBalance = await row.$(userPropsSelectors.demoBalance).getText();
-  assert.equal(demoBalance, user.demoBalance);
-  const waitSupervisor = await row.$(userPropsSelectors.waitSupervisor).getText();
-  assert.equal(waitSupervisor, user.waitSupervisor);
-  const managerType = await row.$(userPropsSelectors.managerType).getText();
-  assert.equal(managerType, user.managerType);
+  const role = await row.$(userPropsSelectors.role);
+  expect(role).toHaveText(user.role);
+  const address_1 = await row.$(userPropsSelectors.address_1);
+  expect(address_1).toHaveText(user.address_1);
+  const address_2 = await row.$(userPropsSelectors.address_2);
+  expect(address_2).toHaveText(user.address_2);
+  const city = await row.$(userPropsSelectors.city);
+  expect(city).toHaveText(user.city);
+  const state = await row.$(userPropsSelectors.state);
+  expect(state).toHaveText(user.stateForRead);
+  const zip = await row.$(userPropsSelectors.zip);
+  expect(zip).toHaveText(user.zip);
+  const description = await row.$(userPropsSelectors.description);
+  expect(description).toHaveText(user.description);
+  const demoBalance = await row.$(userPropsSelectors.demoBalance);
+  expect(demoBalance).toHaveText(user.demoBalance);
+  const waitSupervisor = await row.$(userPropsSelectors.waitSupervisor);
+  expect(waitSupervisor).toHaveText(user.waitSupervisor);
+  const managerType = await row.$(userPropsSelectors.managerType);
+  expect(managerType).toHaveText(user.managerType);
 }
