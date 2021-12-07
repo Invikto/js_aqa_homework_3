@@ -19,10 +19,13 @@ describe('Success message sending', function () {
 
   context('The message is sent to Earth', function () {
 
-    it('The response is "Success" when the correct request and all services are available', function () {
+    it('Valid token => "Success"', function () {
       const token = startEarthServer();
       const response = sendMessage('Hello', 'Earth', token);
       assertResponse(response, 'Success');
+    });
+
+    after('Stop the Earth server', function () {
       stopEarthServer();
     });
 
@@ -34,14 +37,14 @@ describe('Success message sending', function () {
       startSatelite();
     });
 
-    it('The response is "Success" when the correct request and all services are available', function () {
+    it('(Valid token, available satellit ) => "Success"', function () {
       const token = startMarsServer();
       const response = sendMessage('Hello', 'Mars', token);
       assertResponse(response, 'Success');
-      stopMarsServer();
     });
 
-    after('Stop the satelite', function () {
+    after('Stop the satelite and Mars server', function () {
+      stopMarsServer();
       stopSatelite();
     });
 
@@ -61,10 +64,13 @@ describe('Failed message sending', function () {
 
   context('The message is sent to Earth', function () {
 
-    it('The response is "Security Error" when the invalid token', function () {
+    it('Invalid token => "Security Error"', function () {
       startEarthServer();
       const response = sendMessage('Hello', 'Earth', 'X0000');
       assertResponse(response, 'Security Error');
+    });
+
+    after('Stop the Earth server', function () {
       stopEarthServer();
     });
 
@@ -72,36 +78,32 @@ describe('Failed message sending', function () {
 
   context('The message is sent to Mars', function () {
 
-    before('Start the satelite', function () {
+    beforeEach('Start the satelite', function () {
       startSatelite();
     });
 
-    it('The response is "Security Error" when the invalid token', function () {
+    it('(Invalid token, available satellit) => "Security Error"', function () {
       startMarsServer();
       const response = sendMessage('Hello', 'Mars', 'X0000');
       assertResponse(response, 'Security Error');
-      stopMarsServer();
     });
 
-    it('The response is "Service is unavailable" when the unavailable satellite', function () {
+    it('(Valid token, unavailable satellite) => "Service is unavailable"', function () {
       const token = startMarsServer();
       stopSatelite();
       const response = sendMessage('Hello', 'Mars', token);
       assertResponse(response, 'Service is unavailable');
-      stopMarsServer();
-      startSatelite();
     });
 
-    it('The response is "Service is unavailable" when the unavailable satellite and the invalid token', function () {
+    it('(Invalid token, unavailable satellite) => "Service is unavailable"', function () {
       startMarsServer();
       stopSatelite();
       const response = sendMessage('Hello', 'Mars', 'X0000');
       assertResponse(response, 'Service is unavailable');
-      stopMarsServer();
-      startSatelite();
     });
 
-    after('Stop the satelite', function () {
+    after('Stop the satelite and Mars server', function () {
+      stopMarsServer();
       stopSatelite();
     });
 
